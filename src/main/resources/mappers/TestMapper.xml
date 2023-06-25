@@ -3,10 +3,17 @@
         PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.example.spring_batch.mybatis.mappers.TestMapper">
-    <select id="selectTotalCnt" resultType="Integer">
-	<![CDATA[
-        SELECT COUNT(*)
-        FROM TEST_TABLE
+    <select id="selectAllOfTestData" resultType="Integer">
+		<![CDATA[
+        	SELECT *
+        	FROM TEST_TABLE
+			ORDER BY test_id desc
         ]]>
 	</select>
+	<insert id="insertOneTestData">
+		<![CDATA[
+			INSERT INTO TEST_TABLE(num)
+			VALUES(1)
+		]]>
+	</insert>
 </mapper>

@@ -2,7 +2,7 @@
 <!DOCTYPE mapper
         PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
-<mapper namespace="TestMapper">
+<mapper namespace="com.example.spring_batch.mybatis.mappers.TestMapper">
     <select id="selectTotalCnt" resultType="Integer">
 	<![CDATA[
         SELECT COUNT(*)

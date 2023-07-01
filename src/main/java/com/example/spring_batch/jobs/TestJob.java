@@ -1,5 +1,7 @@
 package com.example.spring_batch.jobs;
 
+import com.example.spring_batch.common.MyJobIdIncrementer;
+import com.example.spring_batch.common.MyJobParametersValidator;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.ibatis.session.SqlSessionFactory;
@@ -10,6 +12,7 @@ import org.springframework.batch.core.configuration.annotation.JobBuilderFactory
 import org.springframework.batch.core.configuration.annotation.JobScope;
 import org.springframework.batch.core.configuration.annotation.StepBuilderFactory;
 import org.springframework.batch.core.configuration.annotation.StepScope;
+import org.springframework.batch.core.launch.support.RunIdIncrementer;
 import org.springframework.batch.item.ItemProcessor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
@@ -29,15 +32,18 @@ public class TestJob {
     @Bean(name = "TESTJOB01")
     public Job testJob() throws Exception {
         return jobBuilderFactory.get("TESTJOB01")
-                .start(testStep(null, null))
+                .start(testStep(null, null, null))
+                .validator(new MyJobParametersValidator()) // Spring Batch 제공 DefaultjobParametrsValidator도 있음
+                .incrementer(new MyJobIdIncrementer()) // ID 채번 룰 필요 .. 주의 : incrementer 보다 Program agrs가 우선순위
                 .build();
     }
 
     @Bean(name = "TESTJOB01_TESTSTEP01")
     @JobScope
-    public Step testStep(@Value("#{jobParameters[date]}") String date
-                        , @Value("#{jobParameters[ver]}") String ver) throws Exception {
-        System.out.println("batchxs ver = " + ver + ", " + "date = " + date); // Batch Param debug
+    public Step testStep(@Value("#{jobParameters[ver]}") String ver
+                        , @Value("#{jobParameters[date]}") String date
+                        , @Value("#{jobParameters[id]}") String id) throws Exception {
+        System.out.println("batch ver = " + ver + ", " + "date = " + date + ", " + "id = " + id); // Batch Param debug
 
         return stepBuilderFactory.get("TESTJOB01_TESTSTEP01")
                 .<Integer, Integer>chunk(CHUNK_SIZE)
@@ -45,7 +51,7 @@ public class TestJob {
                 .processor(processor())
                 .writer(myBatisWriter())
                 /*  배치 특성상 동일한 Param 통해 한 번 실행하여 성공하면, 다시 실행되지 않는 특성을 갖는다.
-                    하지만 아래 chain 조건을 걸어주면, Param을 변경하지 않더라도 재실행이 가능해진다.
+                    아래 chain 조건을 걸어주면, complete한 Step에 대해 재실행이 가능해진다.
                 */
                 // .allowStartIfComplete(true)
                 .build();

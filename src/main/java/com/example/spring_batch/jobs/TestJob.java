@@ -2,7 +2,7 @@ package com.example.spring_batch.jobs;
 
 import com.example.spring_batch.common.MyJobIdIncrementer;
 import com.example.spring_batch.common.MyJobParametersValidator;
-import com.example.spring_batch.common.MyTaskExecutor;
+import com.example.spring_batch.config.MyTaskExecutor;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.ibatis.session.SqlSessionFactory;
@@ -20,8 +20,8 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 
 @Slf4j
-@RequiredArgsConstructor
 @Configuration
+@RequiredArgsConstructor
 public class TestJob {
 
     private final JobBuilderFactory jobBuilderFactory;

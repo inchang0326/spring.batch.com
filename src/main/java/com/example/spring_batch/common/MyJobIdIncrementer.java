@@ -13,7 +13,7 @@ public class MyJobIdIncrementer implements JobParametersIncrementer {
     @Override
     public JobParameters getNext(JobParameters parameters) {
         UUID uuid = UUID.randomUUID();
-        log.info("UUID => " + uuid.toString());
+        log.debug("UUID => " + uuid.toString());
         return new JobParametersBuilder().addString("id", uuid.toString()).toJobParameters();
     }
 }

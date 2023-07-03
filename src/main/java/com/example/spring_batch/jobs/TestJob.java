@@ -2,6 +2,7 @@ package com.example.spring_batch.jobs;
 
 import com.example.spring_batch.common.MyJobIdIncrementer;
 import com.example.spring_batch.common.MyJobParametersValidator;
+import com.example.spring_batch.config.MyJobExecutionListener;
 import com.example.spring_batch.config.MyTaskExecutor;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -17,7 +18,6 @@ import org.springframework.batch.item.ItemProcessor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 
 @Slf4j
 @Configuration
@@ -27,6 +27,8 @@ public class TestJob {
     private final JobBuilderFactory jobBuilderFactory;
     private final StepBuilderFactory stepBuilderFactory;
     private final SqlSessionFactory sqlSessionFactory;
+
+    private final MyJobExecutionListener myJobExecutionListener;
     private final MyTaskExecutor myTaskExecutor;
 
     private final int CHUNK_SIZE = 2;
@@ -37,7 +39,7 @@ public class TestJob {
                 .start(testStep(null, null, null))
                 .validator(new MyJobParametersValidator()) // JobParameters 검증용으로, Spring Batch 제공 DefaultjobParametrsValidator도 있다.
                 .incrementer(new MyJobIdIncrementer()) // 새로운 JobParameters 넘겨주기 위한 incrementer. ※ 주의 : Program agrs가 incrementer 보다 우선순위여서 덮어쓴다.
-                .listener(myJobExecutionListener())
+                .listener(myJobExecutionListener.getMyJobExecutionListener(myTaskExecutor.getMyThreadPoolTaskExecutor()))
                 .preventRestart() // 동일한 JobParameters로 실행하지 못하도록 막아주는 preventRestart()
                 .build();
     }
@@ -49,20 +51,20 @@ public class TestJob {
                         , @Value("#{jobParameters[id]}") String id) throws Exception {
         return stepBuilderFactory.get("TESTJOB01_TESTSTEP01")
                 .<Integer, Integer>chunk(CHUNK_SIZE)
-                .reader(myBatisReader())
-                .processor(processor())
-                .writer(myBatisWriter())
+                .reader(myBatisPagingItemReader())
+                .processor(itemProcessor())
+                .writer(myBatisBatchItemWriter())
                 /*  Spring Batch 특성상, complete된 JobExecution을 갖고 있는 JobInstance는 재실행 될 수 없다
                     하지만 allowStartIfComplete(true) chain 조건을 걸어주면, 재실행이 가능해진다.
                 */
                 //.allowStartIfComplete(true)
-                .taskExecutor(myTaskExecutor.get())
+                .taskExecutor(myTaskExecutor.getMyThreadPoolTaskExecutor())
                 .build();
     }
 
     @Bean
     @StepScope
-    public MyBatisPagingItemReader<Integer> myBatisReader() throws Exception { // PagingItemReader thread-safe
+    public MyBatisPagingItemReader<Integer> myBatisPagingItemReader() throws Exception { // PagingItemReader thread-safe
         MyBatisPagingItemReader<Integer> reader = new MyBatisPagingItemReader<>(); // Paging 처리 시 쿼리 단 order by 필수
         reader.setPageSize(CHUNK_SIZE);
         reader.setSqlSessionFactory(sqlSessionFactory);
@@ -73,7 +75,7 @@ public class TestJob {
 
     @Bean
     @StepScope
-    public ItemProcessor<Integer, Integer> processor() {
+    public ItemProcessor<Integer, Integer> itemProcessor() {
         return new ItemProcessor<Integer, Integer>() {
             @Override
             public Integer process(Integer val) throws Exception {
@@ -85,35 +87,11 @@ public class TestJob {
 
     @Bean
     @StepScope
-    public MyBatisBatchItemWriter<Integer> myBatisWriter(){
+    public MyBatisBatchItemWriter<Integer> myBatisBatchItemWriter(){
         MyBatisBatchItemWriter<Integer> writer = new MyBatisBatchItemWriter<>();
         writer.setAssertUpdates(false);
         writer.setSqlSessionFactory(sqlSessionFactory);
         writer.setStatementId("insertOneTestData");
         return writer;
-    }
-
-    @Bean
-    public JobExecutionListener myJobExecutionListener() {
-        return new JobExecutionListener() {
-            @Override
-            public void beforeJob(JobExecution jobExecution) {
-                log.debug("[JobExecutionListener#beforeJob] jobExecution is " + jobExecution.getStatus());
-            }
-
-            @Override
-            public void afterJob(JobExecution jobExecution) {
-                ThreadPoolTaskExecutor threadPoolTaskExecutor = myTaskExecutor.get();
-
-                if(jobExecution.getStatus() == BatchStatus.COMPLETED) {
-                    // todo
-                } else if(jobExecution.getStatus() == BatchStatus.FAILED) {
-                    // todo
-                }
-
-                threadPoolTaskExecutor.shutdown();
-                log.debug("[JobExecutionListener#afterJob] jobExecution is " + jobExecution.getStatus());
-            }
-        };
     }
 }

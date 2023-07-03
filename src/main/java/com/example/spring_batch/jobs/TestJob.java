@@ -76,12 +76,9 @@ public class TestJob {
     @Bean
     @StepScope
     public ItemProcessor<Integer, Integer> itemProcessor() {
-        return new ItemProcessor<Integer, Integer>() {
-            @Override
-            public Integer process(Integer val) throws Exception {
-                System.out.println("val => " + val);
-                return val;
-            }
+        return val -> {
+            System.out.println("val => " + val);
+            return val;
         };
     }
 

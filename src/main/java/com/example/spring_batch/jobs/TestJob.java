@@ -15,21 +15,32 @@ import org.springframework.batch.core.configuration.annotation.JobScope;
 import org.springframework.batch.core.configuration.annotation.StepBuilderFactory;
 import org.springframework.batch.core.configuration.annotation.StepScope;
 import org.springframework.batch.item.ItemProcessor;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 @Slf4j
 @Configuration
-@RequiredArgsConstructor
 public class TestJob {
 
-    private final JobBuilderFactory jobBuilderFactory;
-    private final StepBuilderFactory stepBuilderFactory;
-    private final SqlSessionFactory sqlSessionFactory;
+    @Autowired
+    private JobBuilderFactory jobBuilderFactory;
+    @Autowired
+    private StepBuilderFactory stepBuilderFactory;
 
-    private final MyJobExecutionListener myJobExecutionListener;
-    private final MyTaskExecutor myTaskExecutor;
+    @Autowired
+    @Qualifier("readSqlSessionFactory")
+    private SqlSessionFactory readSqlSessionFactory;
+    @Autowired
+    @Qualifier("writeSqlSessionFactory")
+    private SqlSessionFactory writeSqlSessionFactory;
+
+    @Autowired
+    private MyJobExecutionListener myJobExecutionListener;
+    @Autowired
+    private MyTaskExecutor myTaskExecutor;
 
     private final int CHUNK_SIZE = 2;
 
@@ -66,8 +77,8 @@ public class TestJob {
     @StepScope
     public MyBatisPagingItemReader<Integer> myBatisPagingItemReader() throws Exception { // PagingItemReader thread-safe
         MyBatisPagingItemReader<Integer> reader = new MyBatisPagingItemReader<>(); // Paging 처리 시 쿼리 단 order by 필수
+        reader.setSqlSessionFactory(readSqlSessionFactory);
         reader.setPageSize(CHUNK_SIZE);
-        reader.setSqlSessionFactory(sqlSessionFactory);
         reader.setQueryId("selectAllOfTestData");
         reader.setSaveState(false); // 실패한 지점을 기록하여 실패 지점부터 재실행하게 해주는 setSaveState(). ※ 주의 : Async 처리할 때는 false 처리 해두어야 함
         return reader;
@@ -87,7 +98,7 @@ public class TestJob {
     public MyBatisBatchItemWriter<Integer> myBatisBatchItemWriter(){
         MyBatisBatchItemWriter<Integer> writer = new MyBatisBatchItemWriter<>();
         writer.setAssertUpdates(false);
-        writer.setSqlSessionFactory(sqlSessionFactory);
+        writer.setSqlSessionFactory(writeSqlSessionFactory);
         writer.setStatementId("insertOneTestData");
         return writer;
     }

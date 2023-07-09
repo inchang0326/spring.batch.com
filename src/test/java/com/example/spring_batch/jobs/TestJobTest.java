@@ -9,6 +9,7 @@ import org.springframework.batch.test.JobLauncherTestUtils;
 import org.springframework.batch.test.context.SpringBatchTest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.transaction.annotation.Transactional;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -25,7 +26,7 @@ class TestJobTest {
         JobParameters jobParameters = new JobParametersBuilder()
                 .addString("ver", "2.0")
                 .addString("date", "20230326")
-                .addString("id", "hahahaha")
+                .addString("id", "hahahahahaha")
                 .toJobParameters();
         // when
         JobExecution jobExecution = jobLauncherTestUtils.launchJob(jobParameters);

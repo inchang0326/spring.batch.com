@@ -10,7 +10,20 @@ import org.springframework.context.annotation.Primary;
 import javax.sql.DataSource;
 
 @Configuration
-public class WriteDBConfiguration {
+public class DBConfiguration {
+
+    @Primary
+    @Bean
+    @ConfigurationProperties(prefix = "spring.primary.datasource")
+    public DataSource primaryDataSource() {
+        return DataSourceBuilder.create().type(HikariDataSource.class).build(); // Hikari Connection Pool
+    }
+
+    @Bean
+    @ConfigurationProperties(prefix = "spring.read.datasource")
+    public DataSource readDataSource() {
+        return DataSourceBuilder.create().type(HikariDataSource.class).build();
+    }
 
     @Bean
     @ConfigurationProperties(prefix = "spring.write.datasource")

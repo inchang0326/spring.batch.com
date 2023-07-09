@@ -4,7 +4,6 @@ import com.example.spring_batch.common.MyJobIdIncrementer;
 import com.example.spring_batch.common.MyJobParametersValidator;
 import com.example.spring_batch.config.MyJobExecutionListener;
 import com.example.spring_batch.config.MyTaskExecutor;
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.ibatis.session.SqlSessionFactory;
 import org.mybatis.spring.batch.MyBatisBatchItemWriter;

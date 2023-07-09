@@ -13,9 +13,9 @@ public class MyTaskExecutor {
     @Bean
     public ThreadPoolTaskExecutor getMyThreadPoolTaskExecutor() {
         ThreadPoolTaskExecutor taskExecutor = new ThreadPoolTaskExecutor();
-        taskExecutor.setCorePoolSize(4); // 기본 스레드 풀 크기
-        taskExecutor.setMaxPoolSize(8); // 4개의 스레드가 이미 처리중인데 작업이 더 있을 경우 몇개까지 스레드를 늘릴 것인지
-        taskExecutor.setThreadNamePrefix("async-thread"); // 스레드 이름 prefix
+        taskExecutor.setCorePoolSize(4); // default thread-pool size
+        taskExecutor.setMaxPoolSize(8); // the number of more needed threads when already default thread-pool size occupied
+        taskExecutor.setThreadNamePrefix("async-thread"); // prefix of thread
         return taskExecutor;
     }
 }

@@ -16,6 +16,7 @@ public class MyTaskExecutor {
         taskExecutor.setCorePoolSize(4); // default thread-pool size
         taskExecutor.setMaxPoolSize(8); // the number of more needed threads when already default thread-pool size occupied
         taskExecutor.setThreadNamePrefix("async-thread"); // prefix of thread
+        taskExecutor.setWaitForTasksToCompleteOnShutdown(Boolean.TRUE);
         return taskExecutor;
     }
 }

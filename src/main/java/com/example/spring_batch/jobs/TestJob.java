@@ -69,6 +69,7 @@ public class TestJob {
                 */
                 //.allowStartIfComplete(true)
                 .taskExecutor(myTaskExecutor.getMyThreadPoolTaskExecutor())
+                .throttleLimit(myTaskExecutor.getPoolSize()) // 실제로 사용되는 Thread 수 제한
                 .build();
     }
 

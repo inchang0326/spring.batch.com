@@ -9,7 +9,6 @@ import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 @Configuration
 public class MyTaskExecutor {
 
-    @Qualifier
     @Bean
     public ThreadPoolTaskExecutor getMyThreadPoolTaskExecutor() {
         ThreadPoolTaskExecutor taskExecutor = new ThreadPoolTaskExecutor();

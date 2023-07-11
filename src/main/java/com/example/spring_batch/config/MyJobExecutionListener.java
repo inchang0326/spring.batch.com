@@ -12,11 +12,15 @@ import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 @Configuration
 public class MyJobExecutionListener {
 
+    private long startTime = 0;
+    private long endTime = 0;
+
     @Bean
     public JobExecutionListener getMyJobExecutionListener(ThreadPoolTaskExecutor threadPoolTaskExecutor) {
         return new JobExecutionListener() {
             @Override
             public void beforeJob(JobExecution jobExecution) {
+                startTime = System.currentTimeMillis();
                 log.debug("[JobExecutionListener#beforeJob] jobExecution is " + jobExecution.getStatus());
             }
 
@@ -30,6 +34,9 @@ public class MyJobExecutionListener {
 
                 log.debug("[JobExecutionListener#afterJob] jobExecution is " + jobExecution.getStatus());
                 threadPoolTaskExecutor.shutdown();
+
+                endTime = System.currentTimeMillis();
+                log.debug("Total Process Time is " + ((endTime - startTime) / 1000) + "s");
             }
         };
     }

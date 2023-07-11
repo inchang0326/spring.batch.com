@@ -11,6 +11,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Primary;
 
 import javax.sql.DataSource;
+import java.io.IOException;
 
 @Configuration
 public class MyBatisConfiguration {
@@ -18,45 +19,40 @@ public class MyBatisConfiguration {
     @Autowired
     private ApplicationContext applicationContext;
 
+    private final String writeClassPath = "classpath:mybatis/write/mappers/*.xml";
+    private final String writeBasePackage = "com.example.spring_batch.mybatis.write.mappers";
+
+    private final String readClassPath = "classpath:mybatis/read/mappers/*.xml";
+    private final String readBasePackage = "com.example.spring_batch.mybatis.read.mappers";
+
+    private final String primarySqlSessionFactory = "primarySqlSessionFactory";
+    private final String readSqlSessionFactory = "readSqlSessionFactory";
+    private final String writeSqlSessionFactory = "writeSqlSessionFactory";
+
     @Primary
     @Bean("primarySqlSessionFactory")
     public SqlSessionFactory primarySqlSessionFactory(@Qualifier("primaryDataSource") DataSource dataSource) throws Exception {
-        SqlSessionFactoryBean sqlSessionFactoryBean = new SqlSessionFactoryBean();
-        sqlSessionFactoryBean.setDataSource(dataSource);
-        // spring classpath convention : src/main/resources
-        // sqlSessionFactoryBean.setMapperLocations(applicationContext.getResources("classpath:mybatis/read/mappers/*.xml"));
-
-        MapperScannerConfigurer scannerConfigurer = new MapperScannerConfigurer();
-        // scannerConfigurer.setBasePackage("com.example.spring_batch.mybatis.read.mappers");
-        scannerConfigurer.setSqlSessionFactoryBeanName("primarySqlSessionFactory");
-        scannerConfigurer.setApplicationContext(applicationContext);
-
-        return sqlSessionFactoryBean.getObject();
+        return getSqlSessionFactoryBean(dataSource, null, null, primarySqlSessionFactory);
     }
 
     @Bean("readSqlSessionFactory")
     public SqlSessionFactory readSqlSessionFactory(@Qualifier("readDataSource") DataSource dataSource) throws Exception {
-        SqlSessionFactoryBean sqlSessionFactoryBean = new SqlSessionFactoryBean();
-        sqlSessionFactoryBean.setDataSource(dataSource);
-        sqlSessionFactoryBean.setMapperLocations(applicationContext.getResources("classpath:mybatis/read/mappers/*.xml"));
-
-        MapperScannerConfigurer scannerConfigurer = new MapperScannerConfigurer();
-        scannerConfigurer.setBasePackage("com.example.spring_batch.mybatis.read.mappers");
-        scannerConfigurer.setSqlSessionFactoryBeanName("readSqlSessionFactory");
-        scannerConfigurer.setApplicationContext(applicationContext);
-
-        return sqlSessionFactoryBean.getObject();
+        return getSqlSessionFactoryBean(dataSource, readClassPath, readBasePackage, readSqlSessionFactory);
     }
 
     @Bean("writeSqlSessionFactory")
     public SqlSessionFactory writeSqlSessionFactory(@Qualifier("writeDataSource") DataSource dataSource) throws Exception {
+        return getSqlSessionFactoryBean(dataSource, writeClassPath, writeBasePackage, writeSqlSessionFactory);
+    }
+
+    private SqlSessionFactory getSqlSessionFactoryBean(DataSource dataSource, String classPath, String basePackage, String sqlSessionFactory) throws Exception {
         SqlSessionFactoryBean sqlSessionFactoryBean = new SqlSessionFactoryBean();
         sqlSessionFactoryBean.setDataSource(dataSource);
-        sqlSessionFactoryBean.setMapperLocations(applicationContext.getResources("classpath:mybatis/write/mappers/*.xml"));
+        if( classPath != null ) sqlSessionFactoryBean.setMapperLocations(applicationContext.getResources(classPath));
 
         MapperScannerConfigurer scannerConfigurer = new MapperScannerConfigurer();
-        scannerConfigurer.setBasePackage("com.example.spring_batch.mybatis.write.mappers");
-        scannerConfigurer.setSqlSessionFactoryBeanName("writeSqlSessionFactory");
+        if( basePackage != null ) scannerConfigurer.setBasePackage(basePackage);
+        scannerConfigurer.setSqlSessionFactoryBeanName(sqlSessionFactory);
         scannerConfigurer.setApplicationContext(applicationContext);
 
         return sqlSessionFactoryBean.getObject();

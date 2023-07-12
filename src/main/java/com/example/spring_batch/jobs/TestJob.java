@@ -1,5 +1,6 @@
 package com.example.spring_batch.jobs;
 
+import com.example.spring_batch.apis.TestFeignClient;
 import com.example.spring_batch.common.MyJobIdIncrementer;
 import com.example.spring_batch.common.MyJobParametersValidator;
 import com.example.spring_batch.config.MyJobExecutionListener;
@@ -41,6 +42,9 @@ public class TestJob {
     @Autowired
     private MyTaskExecutor myTaskExecutor;
 
+    @Autowired
+    private TestFeignClient testFeignClient;
+
     private final int CHUNK_SIZE = 2;
 
     @Bean(name = "TESTJOB01")
@@ -59,6 +63,9 @@ public class TestJob {
     public Step testStep(@Value("#{jobParameters[ver]}") String ver
                         , @Value("#{jobParameters[date]}") String date
                         , @Value("#{jobParameters[id]}") String id) throws Exception {
+
+        System.out.println("TEST => " + testFeignClient.helloWorld());
+
         return stepBuilderFactory.get("TESTJOB01_TESTSTEP01")
                 .<Integer, Integer>chunk(CHUNK_SIZE)
                 .reader(myBatisPagingItemReader())

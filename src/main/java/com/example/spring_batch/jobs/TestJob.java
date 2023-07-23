@@ -65,8 +65,8 @@ public class TestJob {
     @Bean(name = "TESTJOB01_TESTSTEP01")
     @JobScope
     public Step testStep(@Value("#{jobParameters[ver]}") String ver
-                        , @Value("#{jobParameters[date]}") String date
-                        , @Value("#{jobParameters[id]}") String id) throws Exception {
+            , @Value("#{jobParameters[date]}") String date
+            , @Value("#{jobParameters[id]}") String id) throws Exception {
 
         System.out.println("TEST => " + testFeignClient.helloWorld());
 

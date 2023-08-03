@@ -2,7 +2,7 @@
 <!DOCTYPE mapper
         PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
-<mapper namespace="com.example.spring_batch.mybatis.mappers.ReadTestMapper">
+<mapper namespace="com.example.spring_batch.mybatis.read.mappers.ReadTestMapper">
     <select id="selectAllOfTestData" resultType="Integer">
 		<![CDATA[
         	SELECT *
@@ -11,5 +11,19 @@
 			OFFSET ${_page} * ${_pagesize}
 			LIMIT ${_pagesize}
         ]]>
+	</select>
+	<select id="selectPartitionOfTestData" resultType="Integer">
+		<![CDATA[
+		SELECT *
+		FROM TEST_TABLE
+		WHERE test_id BETWEEN ${minTestId} AND ${maxTestId}
+		]]>
+	</select>
+	<select id="selectMinMaxByTestId" resultType="HashMap">
+		<![CDATA[
+		SELECT MIN(test_id) AS MIN_TEST_ID
+			 , MAX(test_id) AS MAX_TEST_ID
+		FROM TEST_TABLE
+		]]>
 	</select>
 </mapper>

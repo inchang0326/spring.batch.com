@@ -68,7 +68,7 @@ public class TestJob2 { // Partition Steps
         return stepBuilderFactory.get("TESTJOB02_MASTER_TESTSTEP01")
                 .partitioner("TESTJOB02_SLAVE_TESTSTEP01", customPartitioner)
                 .step(slaveTestStep())
-                .gridSize(myTaskExecutor.getPoolSize())
+                .gridSize(8)
                 .taskExecutor(myTaskExecutor.getMyThreadPoolTaskExecutor())
                 .build();
     }

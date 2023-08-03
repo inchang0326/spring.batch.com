@@ -20,9 +20,9 @@ public class CustomPartitioner implements Partitioner {
     public Map<String, ExecutionContext> partition(int gridSize) {
         HashMap<String, Object> resMap = readTestMapper.selectMinMaxByTestId();
         HashMap<String, ExecutionContext> partition = new HashMap<>();
-        int minTestId = (Integer) resMap.get("max_test_id");
-        int maxTestId = (Integer) resMap.get("min_test_id");
-        int eachValue = ((minTestId - maxTestId) / gridSize) + 1 ;
+        int minTestId = (Integer) resMap.get("min_test_id");
+        int maxTestId = (Integer) resMap.get("max_test_id");
+        int eachValue = ((maxTestId - minTestId) / gridSize) + 1 ;
 
         log.info("min : " + minTestId + " max : " + maxTestId);
 

@@ -17,6 +17,9 @@
 		SELECT *
 		FROM TEST_TABLE
 		WHERE test_id BETWEEN ${minTestId} AND ${maxTestId}
+		ORDER BY test_id
+		OFFSET ${_page} * ${_pagesize}
+		LIMIT ${_pagesize}
 		]]>
 	</select>
 	<select id="selectMinMaxByTestId" resultType="HashMap">

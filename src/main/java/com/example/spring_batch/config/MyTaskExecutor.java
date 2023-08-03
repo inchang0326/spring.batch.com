@@ -1,6 +1,5 @@
 package com.example.spring_batch.config;
 
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
@@ -9,7 +8,7 @@ import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 @Configuration
 public class MyTaskExecutor {
 
-    private final int poolSize = 4;
+    private final int poolSize = 8;
 
     @Bean
     public ThreadPoolTaskExecutor getMyThreadPoolTaskExecutor() {

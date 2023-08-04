@@ -38,8 +38,8 @@ public class FeignClientConfiguration {
                 .build();
 
         // Idle Connection Monitoring
-        Thread th = new IdleConnectionMonitorThread(cm);
-        th.start();
+//        Thread th = new IdleConnectionMonitorThread(cm);
+//        th.start();
 
         return new ApacheHttpClient(httpClient);
     }

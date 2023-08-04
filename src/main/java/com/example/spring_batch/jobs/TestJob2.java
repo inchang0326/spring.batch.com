@@ -46,7 +46,7 @@ public class TestJob2 { // Partition Steps
     @Autowired
     private MyTaskExecutor myTaskExecutor;
 
-    private final int CHUNK_SIZE = 2;
+    private final int CHUNK_SIZE = 42;
 
     @Bean(name = "TESTJOB02")
     public Job testJob() throws Exception {
@@ -78,7 +78,7 @@ public class TestJob2 { // Partition Steps
         return stepBuilderFactory.get("TESTJOB02_SLAVE_TESTSTEP01")
                 .<Integer, Integer>chunk(CHUNK_SIZE)
                 .reader(myBatisPagingItemReader(null, null))
-                .processor(itemProcessor())
+                .processor(itemProcessor(null, null))
                 .writer(myBatisBatchItemWriter(null, null))
                 .build();
     }
@@ -102,9 +102,11 @@ public class TestJob2 { // Partition Steps
     }
 
     @Bean("TESTJOB02_itemProcessor")
-    public ItemProcessor<Integer, Integer> itemProcessor() {
+    @StepScope
+    public ItemProcessor<Integer, Integer> itemProcessor(@Value("#{stepExecutionContext[minTestId]}") Long minTestId
+                                                        , @Value("#{stepExecutionContext[maxTestId]}") Long maxTestId) {
         return val -> {
-            log.debug("val => " + val);
+            log.debug("minTestId : " + minTestId + " maxTestId : " + maxTestId + " val : " + val);
             return val;
         };
     }

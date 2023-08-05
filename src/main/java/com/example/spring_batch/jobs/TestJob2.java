@@ -46,7 +46,7 @@ public class TestJob2 { // Partition Steps
     @Autowired
     private MyTaskExecutor myTaskExecutor;
 
-    private final int CHUNK_SIZE = 42;
+    private final int CHUNK_SIZE = myTaskExecutor.getPoolSize();
 
     @Bean(name = "TESTJOB02")
     public Job testJob() throws Exception {
@@ -68,7 +68,7 @@ public class TestJob2 { // Partition Steps
         return stepBuilderFactory.get("TESTJOB02_MASTER_TESTSTEP01")
                 .partitioner("TESTJOB02_SLAVE_TESTSTEP01", customPartitioner)
                 .step(slaveTestStep())
-                .gridSize(8)
+                .gridSize(myTaskExecutor.getPoolSize())
                 .taskExecutor(myTaskExecutor.getMyThreadPoolTaskExecutor())
                 .build();
     }
@@ -94,7 +94,7 @@ public class TestJob2 { // Partition Steps
 
         MyBatisPagingItemReader<Integer> reader = new MyBatisPagingItemReader<>(); // Paging 처리 시 쿼리 단 order by 필수
         reader.setSqlSessionFactory(readSqlSessionFactory);
-        reader.setPageSize(CHUNK_SIZE);
+        reader.setPageSize(CHUNK_SIZE); // Partition Steps 기법을 사용한다 하더라도, Chunk Oriented Tasklit으로써 Pagination은 해줘야 함.
         reader.setParameterValues(params);
         reader.setQueryId("selectPartitionOfTestData");
         reader.setSaveState(false); // 실패한 지점을 기록하여 실패 지점부터 재실행하게 해주는 setSaveState(). ※ 주의 : MutliThread 기반으로 처리할 때는 상태관리가 안되기 때문에 false 처리 해두어야 함

@@ -8,7 +8,7 @@ import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 @Configuration
 public class MyTaskExecutor {
 
-    private final int poolSize = 8;
+    private final int poolSize = 2;
 
     @Bean
     public ThreadPoolTaskExecutor getMyThreadPoolTaskExecutor() {

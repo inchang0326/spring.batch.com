@@ -8,7 +8,8 @@
         	SELECT *
         	FROM TEST_TABLE
 			ORDER BY test_id
-			OFFSET ${_skiprows} ROWS FETCH NEXT ${_pagesize} ROWS ONLY
+			OFFSET ${_page} * ${_pagesize}
+			LIMIT ${_pagesize}
         ]]>
 	</select>
 	<select id="selectPartitionOfTestData" resultType="Integer">

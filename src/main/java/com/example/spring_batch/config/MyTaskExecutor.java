@@ -4,11 +4,10 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 
-
 @Configuration
 public class MyTaskExecutor {
 
-    private final int poolSize = 2;
+    private final int poolSize = 4;
 
     @Bean
     public ThreadPoolTaskExecutor getMyThreadPoolTaskExecutor() {

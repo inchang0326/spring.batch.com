@@ -20,12 +20,12 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 @SpringBatchTest
 @EnableBatchProcessing
-@SpringBootTest(classes={TestJob.class
+@SpringBootTest(classes={TestJobWithMultiThreadSteps.class
                         , DBConfiguration.class
                         , MyBatisConfiguration.class
                         , MyJobExecutionListener.class
                         , MyTaskExecutor.class})
-class TestJobTest {
+class TestJobTestWithMultiThreadSteps {
     @Autowired
     private JobLauncherTestUtils jobLauncherTestUtils;
 

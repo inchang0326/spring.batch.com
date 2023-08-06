@@ -2,7 +2,6 @@ package com.example.spring_batch.config;
 
 import com.example.spring_batch.mybatis.read.mappers.ReadTestMapper;
 import lombok.RequiredArgsConstructor;
-import lombok.SneakyThrows;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.batch.core.partition.support.Partitioner;
 import org.springframework.batch.item.ExecutionContext;
@@ -17,7 +16,7 @@ import java.util.Map;
 public class CustomPartitioner implements Partitioner {
 
     private final ReadTestMapper readTestMapper;
-    @SneakyThrows
+
     @Override
     public Map<String, ExecutionContext> partition(int gridSize) {
         HashMap<String, Object> resMap = readTestMapper.selectMinMaxByTestId();
@@ -41,8 +40,8 @@ public class CustomPartitioner implements Partitioner {
             start = end + 1;
             end = end + targetSize;
         }
-        System.out.println("partition => " + partition.toString());
-//        throw new Exception();
+        log.info("partition => " + partition.toString());
+
         return partition;
     }
 }

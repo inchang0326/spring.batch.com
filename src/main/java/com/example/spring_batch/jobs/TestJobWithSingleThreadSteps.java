@@ -23,7 +23,7 @@ import org.springframework.context.annotation.Configuration;
 
 @Slf4j
 @Configuration
-public class TestJobWithChunkOrientedSingleTasklet { // SingleThread Step
+public class TestJobWithSingleThreadSteps { // SingleThread Step
 
     @Autowired
     private JobBuilderFactory jobBuilderFactory;

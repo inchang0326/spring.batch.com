@@ -2,8 +2,8 @@
 <!DOCTYPE mapper
         PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
-<mapper namespace="com.example.spring_batch.mybatis.mappers.WriteTestMapper">
-	<insert id="insertOneTestData">
+<mapper namespace="com.example.spring_batch.mybatis.write.mappers.WriteTestMapper">
+	<insert id="insertOneTestData" parameterType="Integer">
 		<![CDATA[
 			INSERT INTO TEST_TABLE2(num)
 			VALUES(${val})

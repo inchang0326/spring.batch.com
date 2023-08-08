@@ -2,6 +2,7 @@ package com.example.spring_batch.jobs;
 
 import com.example.spring_batch.common.MyJobIdIncrementer;
 import com.example.spring_batch.common.MyJobParametersValidator;
+import com.example.spring_batch.config.MyCustomWriter;
 import com.example.spring_batch.config.MyJobExecutionListener;
 import com.example.spring_batch.config.MyTaskExecutor;
 import lombok.extern.slf4j.Slf4j;
@@ -29,19 +30,18 @@ public class TestJobWithSingleThreadSteps { // SingleThread Step
     private JobBuilderFactory jobBuilderFactory;
     @Autowired
     private StepBuilderFactory stepBuilderFactory;
-
     @Autowired
     @Qualifier("readSqlSessionFactory")
     private SqlSessionFactory readSqlSessionFactory;
     @Autowired
     @Qualifier("writeSqlSessionFactory")
     private SqlSessionFactory writeSqlSessionFactory;
-
+    @Autowired
+    private MyCustomWriter myCustomWriter;
     @Autowired
     private MyJobExecutionListener myJobExecutionListener;
     @Autowired
     private MyTaskExecutor myTaskExecutor;
-
     private final int CHUNK_SIZE = 100;
 
     @Bean(name = "TESTJOB03")
@@ -65,7 +65,7 @@ public class TestJobWithSingleThreadSteps { // SingleThread Step
                 .<Integer, Integer>chunk(CHUNK_SIZE)
                 .reader(myBatisPagingItemReader())
                 .processor(itemProcessor())
-                .writer(myBatisBatchItemWriter())
+                .writer(myCustomWriter) // myBatisBatchItemWriter > myCustomWriter 대체
                 /*  Spring Batch 특성상, complete된 JobExecution을 갖고 있는 JobInstance는 재실행 될 수 없다
                     하지만 allowStartIfComplete(true) chain 조건을 걸어주면, 재실행이 가능해진다.
                 */
@@ -95,7 +95,7 @@ public class TestJobWithSingleThreadSteps { // SingleThread Step
 
     @Bean("TESTJOB03_myBatisBatchItemWriter")
     @StepScope
-    public MyBatisBatchItemWriter<Integer> myBatisBatchItemWriter(){
+    public MyBatisBatchItemWriter<Integer> myBatisBatchItemWriter() {
         MyBatisBatchItemWriter<Integer> writer = new MyBatisBatchItemWriter<>();
         writer.setAssertUpdates(false);
         writer.setSqlSessionFactory(writeSqlSessionFactory);

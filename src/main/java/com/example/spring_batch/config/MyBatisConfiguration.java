@@ -1,6 +1,7 @@
 package com.example.spring_batch.config;
 
 import lombok.RequiredArgsConstructor;
+import org.apache.ibatis.session.ExecutorType;
 import org.apache.ibatis.session.SqlSessionFactory;
 import org.mybatis.spring.SqlSessionFactoryBean;
 import org.mybatis.spring.SqlSessionTemplate;
@@ -61,8 +62,13 @@ public class MyBatisConfiguration {
         MyBatisPagingItemReader와 MyBatisBatchItemWriter 객체를 사용하면, 내부적으로 알아서 SqlSessionTemplate 의존성 주입 후 사용함
         MapperInterface를 따로 쓰지 않는 이상 정의하지 않아도 됨
      */
+    @Primary
     @Bean
     public SqlSessionTemplate readSqlSessionTemplate(@Qualifier("readSqlSessionFactory") SqlSessionFactory sqlSessionFactory) {
+        return new SqlSessionTemplate(sqlSessionFactory);
+    }
+    @Bean
+    public SqlSessionTemplate writeSqlSessionTemplate(@Qualifier("writeSqlSessionFactory") SqlSessionFactory sqlSessionFactory) {
         return new SqlSessionTemplate(sqlSessionFactory);
     }
 }

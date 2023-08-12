@@ -1,6 +1,7 @@
 package com.example.spring_batch.config;
 
 import lombok.extern.slf4j.Slf4j;
+import org.apache.ibatis.session.ExecutorType;
 import org.apache.ibatis.session.SqlSession;
 import org.apache.ibatis.session.SqlSessionFactory;
 import org.springframework.batch.core.BatchStatus;
@@ -18,7 +19,12 @@ import java.util.List;
 
 @Slf4j
 @Component
-// If a chunk fails, then all of chunks will be rolled back.
+/*
+    pros and cons
+    pros : If a chunk fails, then all of chunks will be rolled back.
+    cons : Performance Issue
+           Mapper.insert() executes query immediately while addBatch() adds queries on memory and executeBatch() executes them at once.
+ */
 public class MyCustomWriter extends StepListenerSupport implements org.springframework.batch.item.ItemWriter<Integer> {
 
     @Autowired
@@ -31,7 +37,7 @@ public class MyCustomWriter extends StepListenerSupport implements org.springfra
 
     @Override
     public void beforeStep(StepExecution stepExecution) {
-        sqlSession = writeSqlSessionFactory.openSession();
+        sqlSession = writeSqlSessionFactory.openSession(ExecutorType.SIMPLE);
         connection = sqlSession.getConnection();
         try {
             connection.setAutoCommit(false);
@@ -43,9 +49,7 @@ public class MyCustomWriter extends StepListenerSupport implements org.springfra
     public void write(List<? extends Integer> items) {
         try {
             for(Integer item : items) {
-                sqlSession.insert(INSERT_TEST_DATA, item);
-                if(item == 550) throw new Exception();
-            }
+                sqlSession.insert(INSERT_TEST_DATA, item);}
         } catch (Exception e) {
             setFailState(true);
         }

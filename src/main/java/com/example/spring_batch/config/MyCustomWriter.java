@@ -4,6 +4,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.ibatis.session.ExecutorType;
 import org.apache.ibatis.session.SqlSession;
 import org.apache.ibatis.session.SqlSessionFactory;
+import org.mybatis.spring.SqlSessionTemplate;
 import org.springframework.batch.core.BatchStatus;
 import org.springframework.batch.core.ExitStatus;
 import org.springframework.batch.core.StepExecution;
@@ -30,6 +31,7 @@ public class MyCustomWriter extends StepListenerSupport implements org.springfra
     @Autowired
     @Qualifier("writeSqlSessionFactory")
     private SqlSessionFactory writeSqlSessionFactory;
+    private SqlSessionTemplate sqlSessionTemplate;
     private SqlSession sqlSession = null;
     private Connection connection = null;
     private boolean failed = false;
@@ -37,7 +39,7 @@ public class MyCustomWriter extends StepListenerSupport implements org.springfra
 
     @Override
     public void beforeStep(StepExecution stepExecution) {
-        sqlSession = writeSqlSessionFactory.openSession(ExecutorType.SIMPLE);
+        sqlSession = writeSqlSessionFactory.openSession(ExecutorType.BATCH);
         connection = sqlSession.getConnection();
         try {
             connection.setAutoCommit(false);
@@ -49,7 +51,8 @@ public class MyCustomWriter extends StepListenerSupport implements org.springfra
     public void write(List<? extends Integer> items) {
         try {
             for(Integer item : items) {
-                sqlSession.insert(INSERT_TEST_DATA, item);}
+                sqlSession.insert(INSERT_TEST_DATA, item);
+            }
         } catch (Exception e) {
             setFailState(true);
         }
@@ -60,6 +63,8 @@ public class MyCustomWriter extends StepListenerSupport implements org.springfra
         if(isFailed()) { // Writer 오류 발생 시, fail 처리
             context.getStepContext().getStepExecution().setExitStatus(ExitStatus.FAILED); // fail the step
             context.getStepContext().getStepExecution().setStatus(BatchStatus.FAILED); // fail the batch
+        } else {
+            sqlSession.flushStatements();
         }
     }
 

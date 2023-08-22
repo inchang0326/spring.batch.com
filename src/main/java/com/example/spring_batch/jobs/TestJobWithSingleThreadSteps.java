@@ -42,7 +42,7 @@ public class TestJobWithSingleThreadSteps { // SingleThread Step
     private MyJobExecutionListener myJobExecutionListener;
     @Autowired
     private MyTaskExecutor myTaskExecutor;
-    private final int CHUNK_SIZE = 100;
+    private final int CHUNK_SIZE = 2;
 
     @Bean(name = "TESTJOB03")
     public Job testJob() throws Exception {
